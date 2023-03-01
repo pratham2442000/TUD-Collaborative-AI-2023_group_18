@@ -70,6 +70,8 @@ class BaselineAgent(ArtificialBrain):
         self._recentVic = None
         self._receivedMessages = []
         self._moving = False
+        self._SearchToCheck = set()
+        self._RescueToCheck = {}
 
     def initialize(self):
         # Initialization of the state tracker and navigation algorithm
@@ -689,6 +691,8 @@ class BaselineAgent(ArtificialBrain):
                     area = 'area ' + msg.split()[-1]
                     if area not in self._searchedRooms:
                         self._searchedRooms.append(area)
+                    # Add the message to the messages to check
+                    self._SearchToCheck.add(area)
                 # If a received message involves team members finding victims, add these victims and their locations to memory
                 if msg.startswith("Found:"):
                     # Identify which victim and area it concerns
@@ -732,6 +736,8 @@ class BaselineAgent(ArtificialBrain):
                     # Add the victim to the memory of rescued victims when the human's condition is not weak
                     if condition!='weak' and collectVic not in self._collectedVictims:
                         self._collectedVictims.append(collectVic)
+                        # Add the victim to be checked if actually rescued. First argument is victim, second is location
+                        self._RescueToCheck[collectVic]=loc
                     # Decide to help the human carry the victim together when the human's condition is weak
                     if condition=='weak':
                         self._rescue = 'together'
@@ -799,6 +805,26 @@ class BaselineAgent(ArtificialBrain):
         '''
         Baseline implementation of a trust belief. Creates a dictionary with trust belief scores for each team member, for example based on the received messages.
         '''
+
+        # Increase the competence when the human either removes an object or carries a human
+
+
+
+        # Decrease the competence when the human does not perform the action he said he would perform
+
+        # Increase the willingness when the human accepts the request by the agent
+        #for message in receivedMessages:
+            #if 'Continue' in message:
+
+
+
+        # Decrease the willingness when the human rejects the request by the agent
+
+
+
+
+
+
         # Update the trust value based on for example the received messages
         for message in receivedMessages:
             # Increase agent trust in a team member that rescued a victim

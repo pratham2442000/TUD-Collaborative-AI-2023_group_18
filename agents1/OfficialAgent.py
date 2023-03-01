@@ -1,19 +1,17 @@
-import sys, random, enum, ast, time, csv
-import numpy as np
-from matrx import grid_world
-from brains1.ArtificialBrain import ArtificialBrain
-from actions1.CustomActions import *
+import csv
+import enum
+import random
+
 from matrx import utils
-from matrx.grid_world import GridWorld
-from matrx.agents.agent_utils.state import State
+from matrx.actions.object_actions import RemoveObject
 from matrx.agents.agent_utils.navigator import Navigator
 from matrx.agents.agent_utils.state_tracker import StateTracker
-from matrx.actions.door_actions import OpenDoorAction
-from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
-from matrx.actions.move_actions import MoveNorth
 from matrx.messages.message import Message
-from matrx.messages.message_manager import MessageManager
-from actions1.CustomActions import RemoveObjectTogether, CarryObjectTogether, DropObjectTogether, CarryObject, Drop
+
+from actions1.CustomActions import *
+from actions1.CustomActions import CarryObject, Drop
+from brains1.ArtificialBrain import ArtificialBrain
+
 
 class Phase(enum.Enum):
     INTRO = 1,
@@ -34,7 +32,9 @@ class Phase(enum.Enum):
     FIX_ORDER_GRAB = 16,
     FIX_ORDER_DROP = 17,
     REMOVE_OBSTACLE_IF_NEEDED = 18,
-    ENTER_ROOM = 19
+    ENTER_ROOM = 19,
+    CHECK_ROOM_SEARCHED = 20
+
 
 class BaselineAgent(ArtificialBrain):
     def __init__(self, slowdown, condition, name, folder):
@@ -657,6 +657,27 @@ class BaselineAgent(ArtificialBrain):
                 # Drop the victim on the correct location on the drop zone
                 return Drop.__name__, {'human_name': self._humanName}
 
+            if Phase.CHECK_ROOM_SEARCHED == self._phase:
+                room_to = self._SearchToCheck.pop()
+
+                # Plan path to room
+                self._navigator.reset_full()
+                self._door = state.get_room_doors()
+                # Otherwise plan the route to the previously identified area to search
+                if self._door['room_name'] == room_to:
+                    self._doormat = (3, 5)
+                doorLoc = self._doormat
+                self._navigator.add_waypoints([doorLoc])
+                # Follow path to room
+
+
+                # Search room
+
+
+                #
+
+
+
     def _getDropZones(self, state):
         '''
         @return list of drop zones (their full dict), in order (the first one is the
@@ -807,21 +828,27 @@ class BaselineAgent(ArtificialBrain):
         '''
 
         # Increase the competence when the human either removes an object or carries a human
-
-
-
         # Decrease the competence when the human does not perform the action he said he would perform
-
         # Increase the willingness when the human accepts the request by the agent
         #for message in receivedMessages:
             #if 'Continue' in message:
-
-
-
         # Decrease the willingness when the human rejects the request by the agent
 
+        # Randomly decide to check if a victim was rescued
+        def decision(probability=0.2):
+            return random.random() < probability
 
+        # With a chance of 0.2, decide to check the humans actions
+        if decision:
+            # Decide to check if a room is searched, or a human is rescued
+            if decision(0.5) :
+                # Pick a random element from the set of rooms to check
 
+                # Search the room
+                self._phase = Phase.CHECK_ROOM_SEARCHED
+
+            else:
+                # check victim
 
 
 

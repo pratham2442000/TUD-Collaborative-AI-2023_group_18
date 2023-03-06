@@ -230,6 +230,7 @@ class BaselineAgent(ArtificialBrain):
                         self._phase = Phase.PICK_UNSEARCHED_ROOM
 
             if Phase.PICK_UNSEARCHED_ROOM == self._phase:
+
                 agent_location = state[self.agent_id]['location']
                 # Identify which areas are not explored yet
                 unsearchedRooms = [room['room_name'] for room in state.values()
@@ -280,6 +281,7 @@ class BaselineAgent(ArtificialBrain):
                         self._doormat = state.get_room(room_to_search)[-1]['doormat']
 
                         self._phase = Phase.PLAN_PATH_TO_ROOM
+            
             if Phase.PLAN_PATH_TO_ROOM == self._phase:
                 self._navigator.reset_full()
                 if self._checkForTrust:
@@ -375,12 +377,11 @@ class BaselineAgent(ArtificialBrain):
                             self._waiting = True
 
                             # Determine the next area to explore if the human tells the agent not to remove the obstacle
-
                         # If human claims to have searched this room, decrease willingness
                         if self._door['room_name'] in self._searchedRooms:
                             self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="willingness")
-
                             self._checkForTrust = False
+
                         if self.received_messages_content and self.received_messages_content[
                             -1] == 'Continue' and not self._remove:
                             self._answered = True
@@ -402,6 +403,8 @@ class BaselineAgent(ArtificialBrain):
                             if state[{'is_human_agent': True}]:
                                 self._sendMessage('Lets remove rock blocking ' + str(self._door['room_name']) + '!',
                                                   'RescueBot')
+                                # Removing the obstacle with the human; increases trust
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=0.1, comOrWil="willingness")
                                 return None, {}
                         # Remain idle untill the human communicates what to do with the identified obstacle 
                         else:
@@ -487,6 +490,8 @@ class BaselineAgent(ArtificialBrain):
                                               'RescueBot')
                             self._phase = Phase.ENTER_ROOM
                             self._remove = False
+                            # Removing the obstacle alone; decreases competence
+                            self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="competence")
                             return RemoveObject.__name__, {'object_id': info['obj_id']}
                         # Remove the obstacle together if the human decides so
                         if self.received_messages_content and self.received_messages_content[
@@ -503,6 +508,11 @@ class BaselineAgent(ArtificialBrain):
                             if state[{'is_human_agent': True}]:
                                 self._sendMessage('Lets remove stones blocking ' + str(self._door['room_name']) + '!',
                                                   'RescueBot')
+                                
+                                # increase willingness and decrease competence as human couldhave remove stone alone
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=0.1, comOrWil="willingness")
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="competence")
+
                                 return None, {}
                         # Remain idle until the human communicates what to do with the identified obstacle
                         else:
@@ -883,6 +893,8 @@ class BaselineAgent(ArtificialBrain):
                         self._foundVictimLocs[collectVic] = {'room': loc}
                     if collectVic in self._foundVictims and self._foundVictimLocs[collectVic]['room'] != loc:
                         self._foundVictimLocs[collectVic] = {'room': loc}
+                        # decrease competence of the team member who sent the message as the victim was not found in the area he/she said it was before            
+                        self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="competence")
                     # Add the victim to the memory of rescued victims when the human's condition is not weak
                     if condition != 'weak' and collectVic not in self._collectedVictims:
                         self._collectedVictims.append(collectVic)

@@ -291,6 +291,26 @@ class BaselineAgent(ArtificialBrain):
                             self._sendMessage('Moving to ' + str(self._door['room_name']) + ' to pick up ' + self._goalVic + '.', 'RescueBot')
                     if self._goalVic not in self._foundVictims and not self._remove or not self._goalVic and not self._remove :
                         self._sendMessage('Moving to ' + str(self._door['room_name']) + ' because it is the closest unsearched area.', 'RescueBot')
+
+                    for info in state.values():
+                        # While following path to room check if there is victim along the way
+                        if 'class_inheritance' in info and 'CollectableBlock' in info['class_inheritance']:
+                            vic = str(info['img_name'][8:-4])
+                            # Identify injured victim outside 
+                            if 'healthy' not in vic:
+                                if self._answered == False and not self._waiting:
+                                    self._sendMessage('Found ' + vic + ' outside.', 'RescueBot')
+                                # if 'mild' in vic and self._answered == False and not self._waiting:
+                                    # self._sendMessage('Found ' + vic + ' outside.', 'RescueBot')
+
+                                # if trustBeliefs[self._humanName]['competence'] < 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
+                                    # self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + '.','RescueBot')
+                                    # self._rescue = 'alone'
+                                    # self._answered = True
+                                    # self._waiting = False
+                                    # self._recentVic = None
+                                    # self._phase = Phase.TAKE_VICTIM
+
                     self._currentDoor = self._door['location']
                     # Retrieve move actions to execute
                     action = self._navigator.get_move_action(self._state_tracker)
@@ -384,10 +404,7 @@ class BaselineAgent(ArtificialBrain):
                             if not self._remove:
                                 self._answered = True
                                 self._waiting = False
-                                self._sendMessage('Removing rock blocking ' + str(self._door['room_name']) + '.','RescueBot')
-                            if self._remove:
-                                self._sendMessage('Removing tree blocking ' + str(self._door['room_name']) + ' because you asked me to.', 'RescueBot')
-                            self._phase = Phase.ENTER_ROOM
+                                self._sendMessage('Removing stone blocking ' + str(self._door['room_name']) + '.','RescueBot')
                             self._remove = False
                             return RemoveObject.__name__, {'object_id': info['obj_id']}
 

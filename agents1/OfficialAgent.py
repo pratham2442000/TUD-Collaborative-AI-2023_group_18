@@ -494,6 +494,8 @@ class BaselineAgent(ArtificialBrain):
                             self._remove = False
                             # Removing the obstacle alone; decreases competence
                             self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="competence")
+                            self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                              trustChange=-0.1, comOrWil="willingness")
                             return RemoveObject.__name__, {'object_id': info['obj_id']}
                         # Remove the obstacle together if the human decides so
                         if self.received_messages_content and self.received_messages_content[

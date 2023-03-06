@@ -297,20 +297,27 @@ class BaselineAgent(ArtificialBrain):
                         if 'class_inheritance' in info and 'CollectableBlock' in info['class_inheritance']:
                             vic = str(info['img_name'][8:-4])
                             # Identify injured victim outside 
-                            if 'healthy' not in vic:
-                                if self._answered == False and not self._waiting:
-                                    self._sendMessage('Found ' + vic + ' outside.', 'RescueBot')
-                                # if 'mild' in vic and self._answered == False and not self._waiting:
-                                    # self._sendMessage('Found ' + vic + ' outside.', 'RescueBot')
-
-                                # if trustBeliefs[self._humanName]['competence'] < 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
-                                    # self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + '.','RescueBot')
-                                    # self._rescue = 'alone'
-                                    # self._answered = True
-                                    # self._waiting = False
-                                    # self._recentVic = None
-                                    # self._phase = Phase.TAKE_VICTIM
-
+                            if 'healthy' not in vic and vic not in self._foundVictims:
+                                self._foundVictims.append(vic)
+                                self._foundVictimLocs[vic] = {'location': info['location'],'room': self._door['room_name'], 'obj_id': info['obj_id']}
+                                self._recentVic = vic
+                                # Tell human where the victim was found
+                                if trustBeliefs[self._humanName]['competence'] >= 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
+                                    self._sendMessage('Found ' + vic + ' outside of ' + self._door['room_name'] + '.' , 'RescueBot')
+                                # Tell human that you are picking the victim up
+                                if trustBeliefs[self._humanName]['competence'] < 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
+                                    self._sendMessage('Picking up ' + self._recentVic + ' outside of ' + self._door['room_name'] + '.','RescueBot')
+                                    self._rescue = 'alone'
+                                    self._answered = True
+                                    self._waiting = False
+                                    self._recentVic = None
+                                    self._phase = Phase.FIND_NEXT_GOAL
+                                # if 'critical' in vic and self._answered == False and not self._waiting:
+                                    # self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue" or "Continue" searching. \n\n \
+                                        # Important features to consider are: \n explore - areas searched: area ' + str(self._searchedRooms).replace('area','') + ' \n safe - victims rescued: ' + str(self._collectedVictims) + '\n \
+                                        # afstand - distance between us: ' + self._distanceHuman,'RescueBot')
+                                    # self._waiting = True    
+                                
                     self._currentDoor = self._door['location']
                     # Retrieve move actions to execute
                     action = self._navigator.get_move_action(self._state_tracker)

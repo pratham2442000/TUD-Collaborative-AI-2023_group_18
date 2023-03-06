@@ -302,10 +302,9 @@ class BaselineAgent(ArtificialBrain):
                                 self._foundVictimLocs[vic] = {'location': info['location'],'room': self._door['room_name'], 'obj_id': info['obj_id']}
                                 self._recentVic = vic
                                 # Tell human where the victim was found
-                                if trustBeliefs[self._humanName]['competence'] >= 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
-                                    self._sendMessage('Found ' + vic + ' outside of ' + self._door['room_name'] + '.' , 'RescueBot')
-                                # Tell human that you are picking the victim up
-                                if trustBeliefs[self._humanName]['competence'] < 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
+                                if self._trustHuman(self._humanName, trustBeliefs) and 'mild' in vic and self._answered == False and not self._waiting:
+                                    self._sendMessage('Found ' + vic + ' outside of ' + self._door['room_name'] + '.', 'RescueBot')
+                                if not self._trustHuman(self._humanName, trustBeliefs) and 'mild' in vic and self._answered == False and not self._waiting:
                                     self._sendMessage('Picking up ' + self._recentVic + ' outside of ' + self._door['room_name'] + '.','RescueBot')
                                     self._rescue = 'alone'
                                     self._answered = True
@@ -402,7 +401,7 @@ class BaselineAgent(ArtificialBrain):
                         objects.append(info)
                         # Communicate which obstacle is blocking the entrance
                         # If trustBeliefs competence not above 0.40 just remove the rock on your own
-                        if trustBeliefs[self._humanName]['competence'] > 0.40 and self._answered == False and not self._remove and not self._waiting:
+                        if self._trustHuman(self._humanName, trustBeliefs) and self._answered == False and not self._remove and not self._waiting:
                             self._sendMessage('Found stones blocking  ' + str(self._door['room_name']) + '. Please decide whether to "Remove together", "Remove alone", or "Continue" searching. \n \n \
                                 Important features to consider are: \n safe - victims rescued: ' + str(self._collectedVictims) + ' \n explore - areas searched: area ' + str(self._searchedRooms).replace('area','') + ' \
                                 \n clock - removal time together: 3 seconds \n afstand - distance between us: ' + self._distanceHuman + '\n clock - removal time alone: 20 seconds','RescueBot')
@@ -523,12 +522,12 @@ class BaselineAgent(ArtificialBrain):
                                 self._foundVictims.append(vic)
                                 self._foundVictimLocs[vic] = {'location': info['location'],'room': self._door['room_name'], 'obj_id': info['obj_id']}
                                 # Communicate which victim the agent found and ask the human whether to rescue the victim now or at a later stage
-                                if trustBeliefs[self._humanName]['competence'] >= -0.3 and 'mild' in vic and self._answered == False and not self._waiting:
+                                if self._trustHuman(self._humanName, trustBeliefs, competence = 0.3) and 'mild' in vic and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \n \n \
                                         Important features to consider are: \n safe - victims rescued: ' + str(self._collectedVictims) + '\n explore - areas searched: area ' + str(self._searchedRooms).replace('area ','') + '\n \
                                         clock - extra time when rescuing alone: 15 seconds \n afstand - distance between us: ' + self._distanceHuman,'RescueBot')
                                     self._waiting = True
-                                if trustBeliefs[self._humanName]['competence'] < 0.4 and 'mild' in vic and self._answered == False and not self._waiting:
+                                if not self._trustHuman(self._humanName, trustBeliefs, competence = 0.3) and 'mild' in vic and self._answered == False and not self._waiting:
                                     self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + '.','RescueBot')
                                     self._rescue = 'alone'
                                     self._answered = True
@@ -709,6 +708,13 @@ class BaselineAgent(ArtificialBrain):
             if place['drop_zone_nr'] == 0:
                 zones.append(place)
         return zones
+
+    # Default threshold is 0.4 and can be changed according to the action that is performed
+    def _trustHuman(self, human, trustBeliefs, competence = 0.4, willingness = 0.4):
+        if trustBeliefs[human]['competence'] >= competence and trustBeliefs[human]['willingness'] >= willingness:
+            return True
+        else:
+            return False
 
     def _processMessages(self, state, teamMembers, condition):
         '''

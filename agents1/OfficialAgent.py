@@ -955,12 +955,14 @@ class BaselineAgent(ArtificialBrain):
                     name = row[0]
                     competence = float(row[1])
                     willingness = float(row[2])
-                    trustBeliefs[name] = {'competence': competence, 'willingness': willingness}
+                    confidence = float(row[3])
+                    trustBeliefs[name] = {'competence': competence, 'willingness': willingness, 'confidence': confidence}
                 # Initialize default trust values
                 if row and row[0] != self._humanName:
                     competence = default
                     willingness = default
-                    trustBeliefs[self._humanName] = {'competence': competence, 'willingness': willingness}
+                    confidence = -1
+                    trustBeliefs[self._humanName] = {'competence': competence, 'willingness': willingness, 'confidence': confidence}
 
         with open(folder + '/beliefs/currentTrustBelief.csv') as csvfile:
             reader = csv.reader(csvfile, delimiter=';', quotechar="'")
@@ -973,7 +975,8 @@ class BaselineAgent(ArtificialBrain):
                     name = row[0]
                     competence = float(row[1])
                     willingness = float(row[2])
-                    trustBeliefs[name] = {'competence': competence, 'willingness': willingness}
+                    confidence = float(row[3])
+                    trustBeliefs[name] = {'competence': competence, 'willingness': willingness, 'confidence': confidence}
         return trustBeliefs
 
     def _trustBelief(self, members, trustBeliefs, folder, receivedMessages, trustChange: float = 0,
@@ -983,28 +986,29 @@ class BaselineAgent(ArtificialBrain):
         param trustChange indicates with how much value the willingness or competence should be changed.
         '''
 
-        # Increase the competence when the human either removes an object or carries a human
-        # Decrease the competence when the human does not perform the action he said he would perform
-        # Increase the willingness when the human accepts the request by the agent
-        # for message in receivedMessages:
-        # if 'Continue' in message:
-        # Decrease the willingness when the human rejects the request by the agent
-
         if trustChange != 0 and comOrWil == 'competence':
             trustBeliefs[self._humanName]['competence'] += trustChange
             # Restrict the competence belief to a range of -1 to 1
             trustBeliefs[self._humanName]['competence'] = np.clip(trustBeliefs[self._humanName]['competence'], -1, 1)
+            # Increase the confidence
+            trustBeliefs[self._humanName]['confidence'] += 0.01
+            trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
+
         elif trustChange != 0 and comOrWil == 'willingness':
             trustBeliefs[self._humanName]['willingness'] += trustChange
             # Restrict the willingness belief to a range of -1 to 1
             trustBeliefs[self._humanName]['willingness'] = np.clip(trustBeliefs[self._humanName]['willingness'], -1, 1)
+            # Increase the confidence
+            trustBeliefs[self._humanName]['confidence'] += 0.01
+            trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
 
         # Save current trust belief values so we can later use and retrieve them to add to a csv file with all the logged trust belief values
         with open(folder + '/beliefs/currentTrustBelief.csv', mode='w') as csv_file:
             csv_writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            csv_writer.writerow(['name', 'competence', 'willingness'])
+            csv_writer.writerow(['name', 'competence', 'willingness', 'confidence'])
             csv_writer.writerow([self._humanName, trustBeliefs[self._humanName]['competence'],
-                                 trustBeliefs[self._humanName]['willingness']])
+                                 trustBeliefs[self._humanName]['willingness'],
+                                 trustBeliefs[self._humanName]['confidence']])
 
         return trustBeliefs
 

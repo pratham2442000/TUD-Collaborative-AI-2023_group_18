@@ -405,6 +405,8 @@ class BaselineAgent(ArtificialBrain):
                                                   'RescueBot')
                                 # Removing the obstacle with the human; increases trust
                                 self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=0.1, comOrWil="willingness")
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                                  trustChange=0.1, comOrWil="competence")
                                 return None, {}
                         # Remain idle untill the human communicates what to do with the identified obstacle 
                         else:

@@ -32,8 +32,7 @@ class Phase(enum.Enum):
     FIX_ORDER_GRAB = 16,
     FIX_ORDER_DROP = 17,
     REMOVE_OBSTACLE_IF_NEEDED = 18,
-    ENTER_ROOM = 19,
-    CHECK_ROOM_SEARCHED = 20
+    ENTER_ROOM = 19
 
 
 class BaselineAgent(ArtificialBrain):
@@ -513,9 +512,9 @@ class BaselineAgent(ArtificialBrain):
                                 self._sendMessage('Lets remove stones blocking ' + str(self._door['room_name']) + '!',
                                                   'RescueBot')
                                 
-                                # increase willingness and decrease competence as human couldhave remove stone alone
+                                # increase willingness and increase competence
                                 self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=0.1, comOrWil="willingness")
-                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=-0.1, comOrWil="competence")
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages, trustChange=0.1, comOrWil="competence")
 
                                 return None, {}
                         # Remain idle until the human communicates what to do with the identified obstacle
@@ -804,22 +803,6 @@ class BaselineAgent(ArtificialBrain):
                 # Drop the victim on the correct location on the drop zone
                 return Drop.__name__, {'human_name': self._humanName}
 
-            if Phase.CHECK_ROOM_SEARCHED == self._phase:
-                room_to = self._SearchToCheck.pop()
-
-                # Plan path to room
-                self._navigator.reset_full()
-                self._door = state.get_room_doors()
-                # Otherwise plan the route to the previously identified area to search
-                if self._door['room_name'] == room_to:
-                    self._doormat = (3, 5)
-                doorLoc = self._doormat
-                self._navigator.add_waypoints([doorLoc])
-                # Follow path to room
-
-                # Search room
-
-                #
 
     def _getDropZones(self, state):
         '''

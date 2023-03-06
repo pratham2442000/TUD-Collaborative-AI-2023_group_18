@@ -578,6 +578,12 @@ class BaselineAgent(ArtificialBrain):
                             if vic not in self._roomVics:
                                 self._roomVics.append(vic)
 
+                            # If the robot found a victim that the human claims to have found in another room, decrease the competence
+                            if vic in self._foundVictims and self._foundVictimLocs[vic]['room'] != self._door['room_name']:
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                                  trustChange=-0.1, comOrWil="comptence")
+
+
                             # Identify the exact location of the victim that was found by the human earlier
                             if vic in self._foundVictims and 'location' not in self._foundVictimLocs[vic].keys():
                                 self._recentVic = vic
@@ -857,6 +863,9 @@ class BaselineAgent(ArtificialBrain):
                         self._foundVictimLocs[foundVic] = {'room': loc}
                     if foundVic in self._foundVictims and self._foundVictimLocs[foundVic]['room'] != loc:
                         self._foundVictimLocs[foundVic] = {'room': loc}
+                        # Decrease the willingness, as the human is either lying about the location of the victim, or has previously lied about it
+                        self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                          trustChange=-0.1, comOrWil="willingness")
                     # Decide to help the human carry a found victim when the human's condition is 'weak'
                     if condition == 'weak':
                         self._rescue = 'together'

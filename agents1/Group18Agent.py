@@ -311,11 +311,6 @@ class BaselineAgent(ArtificialBrain):
                                     self._waiting = False
                                     self._recentVic = None
                                     self._phase = Phase.FIND_NEXT_GOAL
-                                # if 'critical' in vic and self._answered == False and not self._waiting:
-                                    # self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue" or "Continue" searching. \n\n \
-                                        # Important features to consider are: \n explore - areas searched: area ' + str(self._searchedRooms).replace('area','') + ' \n safe - victims rescued: ' + str(self._collectedVictims) + '\n \
-                                        # afstand - distance between us: ' + self._distanceHuman,'RescueBot')
-                                    # self._waiting = True    
                                 
                     self._currentDoor = self._door['location']
                     # Retrieve move actions to execute
@@ -709,7 +704,7 @@ class BaselineAgent(ArtificialBrain):
                 zones.append(place)
         return zones
 
-    # Default threshold is 0.4 and can be changed according to the action that is performed
+    # Check if human is trustworthy. Default threshold is 0.4 and can be changed according to the action that is performed
     def _trustHuman(self, human, trustBeliefs, competence = 0.4, willingness = 0.4):
         if trustBeliefs[human]['competence'] >= competence and trustBeliefs[human]['willingness'] >= willingness:
             return True

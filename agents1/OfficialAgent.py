@@ -1140,3 +1140,15 @@ class BaselineAgent(ArtificialBrain):
             else:
                 locs.append((x[i], max(y)))
         return locs
+
+    def calulate_prob(self,confidence, competence):
+        '''
+        calculate the probability of the agent's belief
+        '''
+        # make them from 0 to 1
+        confidence = (confidence + 1) / 2
+        competence = (competence + 1) / 2
+        # calculate the probability
+        prob = confidence * (1 - competence) + (1 - confidence)
+
+        return prob

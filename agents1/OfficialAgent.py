@@ -1,17 +1,19 @@
-import csv
-import enum
-import random
-
+import sys, random, enum, ast, time, csv
+import numpy as np
+from matrx import grid_world
+from brains1.ArtificialBrain import ArtificialBrain
+from actions1.CustomActions import *
 from matrx import utils
-from matrx.actions.object_actions import RemoveObject
+from matrx.grid_world import GridWorld
+from matrx.agents.agent_utils.state import State
 from matrx.agents.agent_utils.navigator import Navigator
 from matrx.agents.agent_utils.state_tracker import StateTracker
+from matrx.actions.door_actions import OpenDoorAction
+from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
+from matrx.actions.move_actions import MoveNorth
 from matrx.messages.message import Message
-
-from actions1.CustomActions import *
-from actions1.CustomActions import CarryObject, Drop
-from brains1.ArtificialBrain import ArtificialBrain
-
+from matrx.messages.message_manager import MessageManager
+from actions1.CustomActions import RemoveObjectTogether, CarryObjectTogether, DropObjectTogether, CarryObject, Drop
 
 class Phase(enum.Enum):
     INTRO = 1,
@@ -33,7 +35,6 @@ class Phase(enum.Enum):
     FIX_ORDER_DROP = 17,
     REMOVE_OBSTACLE_IF_NEEDED = 18,
     ENTER_ROOM = 19
-
 
 class BaselineAgent(ArtificialBrain):
     def __init__(self, slowdown, condition, name, folder):
@@ -286,7 +287,7 @@ class BaselineAgent(ArtificialBrain):
                         self._phase = Phase.PLAN_PATH_TO_ROOM
 
                     # If we are checking for trust, go to the room the human has claimed to search
-                    if self._checkForTrust:
+                    if self._checkForTrust and len(self._SearchToCheck) !=0:
                         room_to_search = self._getClosestRoom(state, self._SearchToCheck, agent_location)
                         self._door = state.get_room_doors(room_to_search)[0]
                         self._doormat = state.get_room(room_to_search)[-1]['doormat']

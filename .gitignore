@@ -1,2 +1,6 @@
 .idea/
-venv/
+logs/
+actions1/
+brains1/
+SaR_gui/
+worlds1/

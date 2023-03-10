@@ -1073,7 +1073,7 @@ class BaselineAgent(ArtificialBrain):
             # Restrict the competence belief to a range of -1 to 1
             trustBeliefs[self._humanName]['competence'] = np.clip(trustBeliefs[self._humanName]['competence'], -1, 1)
             # Increase the confidence
-            trustBeliefs[self._humanName]['confidence'] += 0.01
+            trustBeliefs[self._humanName]['confidence'] += 0.05
             trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
 
         elif trustChange != 0 and comOrWil == 'willingness':
@@ -1081,7 +1081,7 @@ class BaselineAgent(ArtificialBrain):
             # Restrict the willingness belief to a range of -1 to 1
             trustBeliefs[self._humanName]['willingness'] = np.clip(trustBeliefs[self._humanName]['willingness'], -1, 1)
             # Increase the confidence
-            trustBeliefs[self._humanName]['confidence'] += 0.01
+            trustBeliefs[self._humanName]['confidence'] += 0.05
             trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
 
         # Save current trust belief values so we can later use and retrieve them to add to a csv file with all the logged trust belief values

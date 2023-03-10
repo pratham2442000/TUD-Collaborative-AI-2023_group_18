@@ -513,6 +513,14 @@ class BaselineAgent(ArtificialBrain):
                     if 'class_inheritance' in info and 'ObstacleObject' in info['class_inheritance'] and 'stone' in \
                             info['obj_id']:
                         objects.append(info)
+
+                        if self._door['room_name'] in self._searchedRooms:
+                            if self.checker != 18:
+                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                                  trustChange=-0.1, comOrWil="willingness")
+                                self.checker = 18
+                            self._checkForTrust = False
+
                         # Communicate which obstacle is blocking the entrance
                         # If trustBeliefs competence not above 0.40 just remove the rock on your own
                         if self._trustHuman(self._humanName, trustBeliefs) and self._answered == False and not self._remove and not self._waiting:
@@ -531,16 +539,7 @@ class BaselineAgent(ArtificialBrain):
                             self._remove = False
                             return RemoveObject.__name__, {'object_id': info['obj_id']}
 
-                        # Determine the next area to explore if the human tells the agent not to remove the obstacle
-                        if self.received_messages_content and self.received_messages_content[-1] == 'Continue' and not self._remove:
-
                         # If human claims to have searched this room, decrease willingness
-                        if self._door['room_name'] in self._searchedRooms:
-                            if self.checker != 18:
-                                self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
-                                                  trustChange=-0.1, comOrWil="willingness")
-                                self.checker = 18
-                            self._checkForTrust = False
 
                         # Determine the next area to explore if the human tells the agent not to remove the obstacle
                         if self.received_messages_content and self.received_messages_content[
@@ -1057,7 +1056,7 @@ class BaselineAgent(ArtificialBrain):
         # Create a dictionary with trust values for all team members
         trustBeliefs = {}
         # Set a default starting trust value
-        default = -0.4
+        default = 0.5
         trustfile_header = []
         trustfile_contents = []
         # Check if agent already collaborated with this human before, if yes: load the corresponding trust values, if no: initialize using default trust values

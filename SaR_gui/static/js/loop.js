@@ -110,7 +110,7 @@ function init() {
     resp.fail(function(data) {
         console.log("Could not connect to MATRX API, retrying in 0.5s");
         lv_reinitialize_vis = true;
-
+        return;
     });
 
 }
@@ -127,7 +127,7 @@ function initial_connect() {
     lv_agent_type = lv_path.substring(0, lv_path.lastIndexOf('/'));
     if (lv_agent_type != "") {
         lv_agent_type = lv_agent_type.substring(1)
-    }
+    };
     // Get the agent ID from the url (e.g. "god", "agent_0123", etc.)
     var lv_ID = lv_path.substring(lv_path.lastIndexOf('/') + 1).toLowerCase();
     // decode the URL (e.g. spaces are encoding in urls as %20), and set the agent ID
@@ -238,7 +238,7 @@ function world_loop() {
             console.log("Provided error:", data.responseJSON)
             lv_first_tick = false;
             lv_reinitialize_vis = true;
-
+            return;
         });
     }
 }

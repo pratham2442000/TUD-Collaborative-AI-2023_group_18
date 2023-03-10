@@ -816,7 +816,7 @@ function compare_objects(o1, o2) {
     }
 
     return true;
-}
+};
 
 /*
  * Move an object to a new x, y coordinate using css

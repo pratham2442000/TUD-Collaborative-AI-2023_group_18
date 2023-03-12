@@ -199,7 +199,7 @@ class BaselineAgent(ArtificialBrain):
                 prob = self.calulate_prob(confidence, competence)
 
                 if decision(
-                        prob) and not self._carryingTogether and not self._remove and not self._rescue == 'together' and not self._carrying:
+                        prob) and not self._carryingTogether and not self._remove and not self._rescue == 'together' and not self._carrying and not self._waiting:
                     self._checkForTrust = True
 
                 # Check which victims can be rescued next because human or agent already found them

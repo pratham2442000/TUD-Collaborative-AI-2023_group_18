@@ -270,6 +270,26 @@ class BaselineAgent(ArtificialBrain):
                 # If there are still areas to search, define which one to search next
                 else:
 
+                    # If we are checking for trust, go to the room the human has claimed to search
+                    if self._checkForTrust and len(self._SearchToCheck) != 0 and self._currentDoor is None:
+                        room_to_search = self._getClosestRoom(state, self._SearchToCheck, agent_location)
+                        self._door = state.get_room_doors(room_to_search)[0]
+                        self._doormat = state.get_room(room_to_search)[-1]['doormat']
+
+                        if self._door['room_name'] == 'area 1':
+                            self._doormat = (3, 5)
+
+                        self._phase = Phase.PLAN_PATH_TO_ROOM
+
+                    elif self._checkForTrust and len(self._SearchToCheck) != 0 and self._currentDoor is not None:
+                        room_to_search = self._getClosestRoom(state, self._SearchToCheck, self._currentDoor)
+                        self._door = state.get_room_doors(room_to_search)[0]
+                        self._doormat = state.get_room(room_to_search)[-1]['doormat']
+
+                        if self._door['room_name'] == 'area 1':
+                            self._doormat = (3, 5)
+                        self._phase = Phase.PLAN_PATH_TO_ROOM
+
                     # Identify the closest door when the agent did not search any areas yet
                     if self._currentDoor is None:
                         # Find all area entrance locations
@@ -293,25 +313,6 @@ class BaselineAgent(ArtificialBrain):
                             self._doormat = (3, 5)
                         self._phase = Phase.PLAN_PATH_TO_ROOM
 
-                    # If we are checking for trust, go to the room the human has claimed to search
-                    if self._checkForTrust and len(self._SearchToCheck) != 0 and self._currentDoor is None:
-                        room_to_search = self._getClosestRoom(state, self._SearchToCheck, agent_location)
-                        self._door = state.get_room_doors(room_to_search)[0]
-                        self._doormat = state.get_room(room_to_search)[-1]['doormat']
-
-                        if self._door['room_name'] == 'area 1':
-                            self._doormat = (3, 5)
-
-                        self._phase = Phase.PLAN_PATH_TO_ROOM
-
-                    elif self._checkForTrust and len(self._SearchToCheck) != 0 and self._currentDoor is not None:
-                        room_to_search = self._getClosestRoom(state, self._SearchToCheck, self._currentDoor)
-                        self._door = state.get_room_doors(room_to_search)[0]
-                        self._doormat = state.get_room(room_to_search)[-1]['doormat']
-
-                        if self._door['room_name'] == 'area 1':
-                            self._doormat = (3, 5)
-                        self._phase = Phase.PLAN_PATH_TO_ROOM
 
             if Phase.PLAN_PATH_TO_ROOM == self._phase:
 

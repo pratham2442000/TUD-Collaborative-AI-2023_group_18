@@ -828,6 +828,9 @@ class BaselineAgent(ArtificialBrain):
                     # int value
                     self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
                                       trustChange=-0.1, comOrWil="willingness")
+                    self._trustBelief(self._teamMembers, trustBeliefs, self._folder, self._receivedMessages,
+                                      trustChange=-0.1, comOrWil="competence")
+
 
                     self._roomVics = []
                     # Reset received messages (bug fix)

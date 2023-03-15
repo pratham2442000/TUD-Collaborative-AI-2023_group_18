@@ -1159,7 +1159,7 @@ class BaselineAgent(ArtificialBrain):
         # Create a dictionary with trust values for all team members
         trustBeliefs = {}
         # Set a default starting trust value
-        default = 0.5
+        default = -1.0
         trustfile_header = []
         trustfile_contents = []
         # Check if agent already collaborated with this human before, if yes: load the corresponding trust values, if no: initialize using default trust values
@@ -1210,19 +1210,19 @@ class BaselineAgent(ArtificialBrain):
         '''
 
         if trustChange != 0 and comOrWil == 'competence':
-            trustBeliefs[self._humanName]['competence'] += trustChange
+            trustBeliefs[self._humanName]['competence'] += 0
             # Restrict the competence belief to a range of -1 to 1
             trustBeliefs[self._humanName]['competence'] = np.clip(trustBeliefs[self._humanName]['competence'], -1, 1)
             # Increase the confidence
-            trustBeliefs[self._humanName]['confidence'] += 0.05
+            trustBeliefs[self._humanName]['confidence'] += 0
             trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
 
         elif trustChange != 0 and comOrWil == 'willingness':
-            trustBeliefs[self._humanName]['willingness'] += trustChange
+            trustBeliefs[self._humanName]['willingness'] += 0
             # Restrict the willingness belief to a range of -1 to 1
             trustBeliefs[self._humanName]['willingness'] = np.clip(trustBeliefs[self._humanName]['willingness'], -1, 1)
             # Increase the confidence
-            trustBeliefs[self._humanName]['confidence'] += 0.05
+            trustBeliefs[self._humanName]['confidence'] += 0
             trustBeliefs[self._humanName]['confidence'] = np.clip(trustBeliefs[self._humanName]['confidence'], -1, 1)
 
         # Save current trust belief values so we can later use and retrieve them to add to a csv file with all the logged trust belief values
